@@ -1,0 +1,11 @@
+*.pyc
+*.pyo
+*.orig
+__pycache__
+*.log
+*.swp
+*.DS_Store
+media/
+static/
+venv/
+.env
