@@ -1,14 +1,23 @@
+from django.core.serializers import serialize
 from django.http import JsonResponse
-from django.core import serializers
-from blog.models import Post
+
+from blog.models import Post, Comment, Tag
 
 
 def blog_posts(request):
-    # Retrieve all blog posts from the database
     posts = Post.objects.all()
+    post_data = serialize("json", posts)
 
-    # Serialize the posts to JSON
-    data = serializers.serialize("json", posts)
+    comments = Comment.objects.all()
+    comment_data = serialize("json", comments)
 
-    # Return the data as a JSON response
-    return JsonResponse(data, safe=False)
+    tags = Tag.objects.all()
+    tag_data = serialize("json", tags)
+
+    return JsonResponse(
+        {
+            "posts": post_data,
+            "comments": comment_data,
+            "tags": tag_data,
+        }
+    )
