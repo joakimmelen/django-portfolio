@@ -15,6 +15,10 @@ class Post(models.Model):
     tags = models.ManyToManyField(Tag)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True)
+
+    class Meta:
+        fields = ['id', 'title', 'content', 'author', 'tags', 'created_at', 'updated_at']
+
     
     def __str__(self):
         return self.title

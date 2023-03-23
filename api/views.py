@@ -1,12 +1,12 @@
 import json
 from django.core.serializers import serialize
 from django.http import JsonResponse
-
+from django.db.models import Prefetch
 from blog.models import Post, Comment, Tag
 
 
 def blog_posts(request):
-    posts = Post.objects.all()
+    posts = Post.objects.prefetch_related(Prefetch('tags', queryset=Tag.objects.all()))
     post_data = json.loads(serialize("json", posts))
 
     comments = Comment.objects.all()
