@@ -1,13 +1,13 @@
 from django.http import JsonResponse
 from django.views import View
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from django.contrib.auth.views import LoginView
 import json
 
 
-@method_decorator(csrf_exempt, name="dispatch")
 class RegisterView(View):
     def post(self, request):
         print(request)
@@ -31,20 +31,20 @@ class RegisterView(View):
             },
             status=201,
         )
-
-
-@method_decorator(csrf_exempt, name="dispatch")
-class LoginView(View):
-    def post(self, request):
-        print(request)
+        
+@csrf_exempt
+class CustomLoginView(LoginView):
+    def post(self, request, *args):
         data = json.loads(request.body)
-        username = data.get("username")
-        password = data.get("password")
+        request.POST = request.POST.copy()
+        request.POST['username'] = data.get("username")
+        request.POST['password'] = data.get("password")
+        return super().post(request, *args)
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
-            print("User logged in successfully")
-            return JsonResponse({"message": "Login successful"})
-        else:
-            print("Invalid credentials trying to log in")
-            return JsonResponse({"error": "Invalid credentials"}, status=400)
+
+def check_user_status(request):
+    print(request.user.is_authenticated)
+    if request.user.is_authenticated:
+        return JsonResponse({"is_authenticated": True, "is_superuser": request.user.is_superuser})
+    else:
+        return JsonResponse({"is_authenticated": False})
