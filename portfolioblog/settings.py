@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from middlewares.cors_middleware import CorsMiddleware
 from dotenv import load_dotenv
 
 load_dotenv()  # Load environment variables from .env file
@@ -31,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    'corsheaders',
     "accounts",
     "api",
     "blog",
@@ -44,7 +44,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "middlewares.cors_middleware.CorsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "portfolioblog.urls"
@@ -92,4 +92,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173", 
+]

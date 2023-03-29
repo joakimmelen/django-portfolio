@@ -1,10 +1,7 @@
 from django.http import JsonResponse
 from django.views import View
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
-from django.contrib.auth.views import LoginView
 import json
 
 
@@ -32,16 +29,32 @@ class RegisterView(View):
             status=201,
         )
         
-@csrf_exempt
-class CustomLoginView(LoginView):
-    def post(self, request, *args):
+        
+def api_login(request):
+    print(request)
+    if request.method == 'POST':
         data = json.loads(request.body)
-        request.POST = request.POST.copy()
-        request.POST['username'] = data.get("username")
-        request.POST['password'] = data.get("password")
-        return super().post(request, *args)
+        username = data.get('username')
+        password = data.get('password')
+        user = authenticate(request, username=username, password=password)
 
+        if user is not None:
+            login(request, user)
+            return JsonResponse({'detail': 'Login successful'}, status=200)
+        else:
+            return JsonResponse({'detail': 'Invalid credentials'}, status=400)
+    else:
+        return JsonResponse({'detail': 'Invalid request method'}, status=405)
+    
 
+def api_logout(request):
+    if request.user.is_authenticated:
+        logout(request)
+        return JsonResponse({'detail': 'Logout successful'}, status=status.HTTP_200_OK)
+    else:
+        return JsonResponse({'detail': 'User not logged in'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
 def check_user_status(request):
     print(request.user.is_authenticated)
     if request.user.is_authenticated:
